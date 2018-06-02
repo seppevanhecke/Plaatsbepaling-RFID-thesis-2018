@@ -8,8 +8,6 @@
 #ifndef SRC_POSITIEBEPALING_H_
 #define SRC_POSITIEBEPALING_H_
 
-
-//#include "setup.h"
 /*-----
  * test linked list
  */
@@ -22,9 +20,6 @@
 #include "em_gpio.h"
 #include "em_int.h"
 #include "setup.h"
-/*------------
- * einde test linked list
- */
 
 uint32_t baudrate;
 uint8_t opcode[1];
@@ -49,8 +44,6 @@ struct RFIDData{
 }RFIDData_t;
 
 struct RFIDData *head;
-//struct RFIDData *current = NULL;
-//struct RFIDData *next = NULL;
 
 /*
  * Database of tags

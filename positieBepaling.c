@@ -161,14 +161,6 @@ void trilateration(long pos[MAX_SUB_POSITIONS][2], long tagPos[3][2], long int t
 	long *B = NULL;
 	int i,j;
 
-
-	//if number of tags is not number of dist: return -1,-1 --> fault
-//	if(numberOfDist != numberOfTags){
-//		pos[0] = -1;
-//		pos[1] = -1;
-//		return;
-//	}
-
 	//allocate A and B matrix
 	A = malloc(numberOfTags*sizeof(long *));
 	for(i = 0;i<numberOfTags;i++){
@@ -358,7 +350,7 @@ void deleteNextNode(struct RFIDData *current){
 	return;
 }
 /*
- *Zoek lengte van linked list
+ *search length of linked list
  */
 int length(){
 	int lenght = 0;
@@ -371,7 +363,7 @@ int length(){
 }
 
 /*
- * sorteer linked list op EPC
+ * sort linked list on base of EPC
  */
 void sort(){
 	int i, j, k, tempRssi, compEPC;
@@ -401,7 +393,7 @@ void sort(){
 				next->rssi = tempRssi;
 			}
 			else {
-				if(compEPC == 0){ // zelfde tag dan sorteren op rssi van klein naar groot
+				if(compEPC == 0){ // same tag --> further sorting on rssi value from small to great
 					if(current->rssi <= next->rssi){
 						tempRssi = current->rssi;
 						current->rssi = next->rssi;
@@ -469,18 +461,15 @@ void getAverageRssi(){
 }
 
 void changeRssiToMillimeter(){
-	//int size = length();
 	struct RFIDData *current;
-	//struct RFIDData *next;
-
 	current = head;
-	//next = head->next;
 	do{
-
+	/*
+	* use comment to choose between linear or exponential linearisation 
+	*/
 		//current->dist = getMillimeterLineair(current->rssi*-1);
 		current->dist = getMillimeterExp(current->rssi*-1);
 		current = current->next;
-		//next = current->next;
 	}
 	while(current!=NULL);
 
@@ -676,16 +665,8 @@ void calculatePosWithCombination(){
 	pos[0][0] = xPos/correctCount;					//take average of correct xPos values
 	pos[0][1] = yPos/correctCount;					//take average of correct yPos values
 	return;
-
-
-
-
-
 }
-/*-------------------------------------------------------------------------
 
- * einde test gelinkte lijst van inkomende data
- */
 
 
 

@@ -15,10 +15,6 @@
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_int.h"
-//#include "positieBepaling.h"
-/*
- * lcd test
- */
 #include "em_lcd.h"
 #include "segmentlcd.h"
 

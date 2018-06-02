@@ -29,19 +29,6 @@ void LEUART0_IRQHandler(void)
   leuartif = LEUART_IntGet(LEUART0);
   LEUART_IntClear(LEUART0, LEUART_IntGet(LEUART0));
 
-
-//  if(len==10){
-//	  rxBuffer.length           = RX_BUFFER_SIZE - 1 - ((dmaControlBlock->CTRL >> 4) & 0x3FF);
-//	  /* Reactivate DMA */
-//	      DMA_ActivateBasic(DMA_CHANNEL_RX,     			/* Activate DMA channel 0 */
-//	                        true,            				/* Activate using primary descriptor */
-//	                        false,           				/* No DMA burst */
-//	                        NULL,            				/* Keep source */
-//	                        NULL,            				/* Keep destination */
-//	  					  RX_BUFFER_SIZE - 1);    		/* Number of DMA transfer elements (minus 1) */
-//	      dataReceived = true;
-//  }
-
   /* Signal frame found. */
   if (leuartif & LEUART_IF_SIGF)
   {
@@ -59,25 +46,6 @@ void LEUART0_IRQHandler(void)
                       NULL,            				/* Keep destination */
 					  RX_BUFFER_SIZE - 1);    		/* Number of DMA transfer elements (minus 1) */
   }
-
-  /* Signal frame found. */
-  //if (leuartif & LEUART_IF_RXDATAV)
-  //  {
-	//  rxBuffer.length++;
-//      /* Zero-terminate rx buffer */
-//      len            = RX_BUFFER_SIZE - 1 - ((dmaControlBlock->CTRL >> 4) & 0x3FF);
-//      rxBuffer.length++;
-//      rxBuffer.buffer[len - 1] = 0;
-//
-//      /* Reactivate DMA */
-//      DMA_ActivateBasic(DMA_CHANNEL_RX,     			/* Activate DMA channel 0 */
-//                        true,            				/* Activate using primary descriptor */
-//                        false,           				/* No DMA burst */
-//                        NULL,            				/* Keep source */
-//                        NULL,            				/* Keep destination */
-//  					  RX_BUFFER_SIZE - 1);    		/* Number of DMA transfer elements (minus 1) */
-//    }
-  //GPIO_PinModeSet(gpioPortE, 2, gpioModePushPull, 0);
 }
 
 void GPIO_ODD_IRQHandler(void)
@@ -106,10 +74,6 @@ void rxDmaComplete(unsigned int channel, bool primary, void *user) /// komt hier
  ******************************************************************************/
 void setupLeuart(void)
 {
-//  LEUART_Reset(LEUART0);
-//  NVIC_ClearPendingIRQ(LEUART0_IRQn);
-//  unsigned long HFXOFrequency = 24000000u;
-//  SystemHFXOClockSet(HFXOFrequency);
 
   /* Enable peripheral clocks */
   CMU_ClockEnable(cmuClock_HFPER, true);
@@ -144,18 +108,11 @@ void setupLeuart(void)
 
   LEUART_Init(LEUART0, &init);
 
-//  baudrate = CMU_ClockFreqGet(cmuSelect_CORELEDIV2);
-
-  //baudrate = LEUART_BaudrateGet(LEUART0);
-
   /* Enable pins at default location */
   LEUART0->ROUTE = LEUART_ROUTE_RXPEN | LEUART_ROUTE_TXPEN | LEUART_LOCATION;
 
   /* Set RXDMAWU to wake up the DMA controller in EM2 */
   LEUART_RxDmaInEM2Enable(LEUART0, true);
-
-  /* Set TXDMAWU to wake up the DMA controller in EM2 */ //************************************************************************ testje
- //   LEUART_TxDmaInEM2Enable(LEUART0, true);
 
     /* Set LEUART signal frame */
     LEUART0->SIGFRAME = ';'; //datablock eindigd met ;
@@ -256,14 +213,6 @@ void setupDma(void)
   	  txdescrCfg.hprot   = 0;
   	  DMA_CfgDescr(DMA_CHANNEL_TX, true, &txdescrCfg);
 
-//  	  /* Activate basic dma cycle using channel0 */
-//  	  DMA_ActivateBasic(0,
-//  	                    true,
-//  	                    false,
-//  						(void *)&LEUART0->TXDATA,
-//  	                    (void *)&LEUART0->RXDATA,
-//  	                    0);
-
   /* Configure loop transfer mode */
   loopCfg.enable = true;
   loopCfg.nMinus1 = 0;  /* Single transfer per DMA cycle*/
@@ -275,19 +224,6 @@ void setupDma(void)
  *****************************************************************************/
 void sendUartData(void *buffer, int bytes)
 {
-//  /* Wait until channel becomes available */
-//  while(DMA_ChannelEnabled(DMA_CHANNEL_TX));
-//
-//  /* Activate DMA channel for TX */
-//  DMA_ActivateBasic(DMA_CHANNEL_TX,
-//                    true,
-//                    false,
-//                    (void *)&(UART0->TXDATA),
-//                    buffer,
-//                    bytes - 1);
-
-	/* Wait until channel becomes available */
-	  //while(DMA_ChannelEnabled(DMA_CHANNEL_TX));
 
 	  /* Activate DMA channel for TX */
 	  DMA_ActivateBasic(DMA_CHANNEL_TX,
@@ -297,47 +233,6 @@ void sendUartData(void *buffer, int bytes)
 	                    buffer,
 	                    bytes - 1);
 }
-
-/**************************************************************************//**
- * @brief  Setup Timer
- * Configure TIMER to reset and start counter every time the RX pin on
- * the UART has a falling edge. If the RX line is idle for longer than the
- * timeout period the overflow interrupt is called indicating that a full
- * message has been received.
- *****************************************************************************/
-//void setupTimer(void)
-//{
-//  TIMER_Init_TypeDef   init   = TIMER_INIT_DEFAULT;
-//  TIMER_InitCC_TypeDef initCc = TIMER_INITCC_DEFAULT;
-//
-//  /* Configure TIMER0 to set a DMA request on falling input on CC0 */
-//  init.fallAction  = timerInputActionReloadStart ; /* Reload and Start TIMER on falling edge on CC0 input */ // geef aan dat de RX heeft een startsignaal gekregen
-//  init.oneShot     = true;                         /* One shot, stop on overflow */
-//  init.enable      = false;                        /* Do not start timer */
-//  init.prescale    = timerPrescale1024;            /* Prescale by 1024 */
-//  TIMER_Init(TIMER0, &init);
-//
-//  /* Configure CC0 to listen to PRS CH0 */
-//  initCc.prsInput = true;
-//  initCc.prsSel   = timerPRSSELCh0; //luistert naar channel 0 van de PRS
-//  TIMER_InitCC(TIMER0, 0, &initCc);
-//
-//  /* Set TOP value according to timout value*/
-//  TIMER_TopSet(TIMER0, (CMU_ClockFreqGet(cmuClock_TIMER0)/1000)*RX_TIMEOUT_MS/1024); //wacht 2 seconden nadat de laatste falling edge is geweest
-//
-//  /* Enable input sensing for PRS */
-//  GPIO_InputSenseSet(GPIO_INSENSE_PRS, GPIO_INSENSE_PRS);
-//
-//  /* Configure pin 1 interrupt/PRS to port E. Setting is shared by interrupts and PRS */ //watch the RX pin of the LEUART0
-//  GPIO_IntConfig(gpioPortD, 5, false, false, false);
-//
-//  /* Configure PRS channel 0 to listen to pin 5 PRS signals */
-//  PRS_SourceSignalSet(0, PRS_CH_CTRL_SOURCESEL_GPIOL, PRS_CH_CTRL_SIGSEL_GPIOPIN5, prsEdgeOff); // channal: 0 , source is een GPIO met pinnummer 5
-//
-//  /* Generate interrupt on overflow (timeout) */
-//  TIMER_IntEnable(TIMER0, TIMER_IEN_OF);
-//  NVIC_EnableIRQ(TIMER0_IRQn);
-//}
 
 /***************************************************************************//**
  * @brief  Gpio setup. Setup button pins to trigger falling edge interrupts.
@@ -360,7 +255,6 @@ void gpioSetup(void)
 
   /* Set falling edge interrupt for both ports */
   GPIO_IntConfig(gpioPortB, 9, false, true, true);
-  //GPIO_IntConfig(gpioPortD, 3, false, true, true);
 
   /* Enable interrupt in core for even and odd gpio interrupts */
 
